@@ -13,7 +13,8 @@ dependencies = [
     "dm-tree (>=0.1.9,<0.2.0)",
     "websockets (>=15.0.1,<16.0.0)",
     "msgpack (>=1.1.1,<2.0.0)",
-    "tyro (>=0.9.31,<0.10.0)"
+    "tyro (>=0.9.31,<0.10.0)",
+    "vlarl-client @ file:///home/polaris/tea/vlarl/vlarl_client"
 ]
 
 [tool.poetry]
@@ -22,6 +23,8 @@ packages = [{include = "vlarl_infra", from = "src"}]
 [tool.poetry.scripts]
 vlarl-run-worker = "vlarl_infra.cli:main"
 
+[tool.poetry.dependencies]
+vlarl-client = {develop = true}
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"

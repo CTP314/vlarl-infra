@@ -8,6 +8,7 @@ from loguru import logger
 import vlarl_infra
 from vlarl_infra.utils.registration import REGISTERED_ENV_CONFIGS
 from vlarl_infra.envs.base_env import BaseEnvConfig
+from vlarl_client.websocket_worker_agent import WebSocketWorkerAgent
 
 
 @dataclasses.dataclass
@@ -16,6 +17,9 @@ class Args:
     env: BaseEnvConfig
     num_episodes: int = 1
     log_level: Literal["DEBUG", "INFO"] = "INFO"
+    
+    host: str =  "0.0.0.0"
+    port: int = 8000
     
 _CONFIGS_DICT = {k.lower(): Args(uid=k, env=v) for k, v in REGISTERED_ENV_CONFIGS.items()}
 
@@ -29,6 +33,13 @@ def _main(args: Args):
     logger.info(f"Selected env: {args.uid}")
     logger.info(f"Env config: {args.env}")
 
+    try: 
+        worker_agent = WebSocketWorkerAgent(host=args.host, port=args.port)
+        logger.info(f"Connected to server with metadata: {worker_agent.get_server_metadata()}")
+    except Exception as e:
+        logger.error(f"Failed to connect to server: {e}")
+        return
+
     env = gym.make(args.uid, config=args.env)
 
     for ep in range(args.num_episodes):
@@ -36,20 +47,23 @@ def _main(args: Args):
         logger.info(f"Episode {ep}:")
         logger.info("  Info:", info)
         
-        done = False
+        terminated = False
         truncated = False
         step_count = 0
         total_reward = 0.0
         
-        while not (done or truncated):
-            action = env.unwrapped.fake_action()
-            obs, reward, done, truncated, info = env.step(action)
+        while not (terminated or truncated):
+            action_data = worker_agent.infer(dataclasses.asdict(obs))
+            action = action_data["action"]
+            obs, reward, terminated, truncated, info = env.step(action)
             step_count += 1
-            total_reward += reward
-            
-            if step_count % 100 == 0 or done or truncated:
-                logger.debug(f"    Step {step_count}: reward={reward}, done={done}, truncated={truncated}")
-        
+            total_reward += float(reward)
+
+            worker_agent.feedback(dataclasses.asdict(obs), float(reward), terminated, truncated, info)
+
+            if step_count % 100 == 0 or terminated or truncated:
+                logger.debug(f"    Step {step_count}: reward={reward}, terminated={terminated}, truncated={truncated}")
+
         logger.info(f"  Episode {ep} finished after {step_count} steps with total reward {total_reward}")
     
 def main():

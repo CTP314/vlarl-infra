@@ -9,7 +9,7 @@ import gymnasium as gym
 
 DType = TypeVar("DType", bound=np.generic)
 
-ImageArray = Annotated[npt.NDArray[DType], ("b", "h", "w", "c")]
+ImageArray = Annotated[npt.NDArray[np.uint8], ("b", "h", "w", "c")]
 StateArray = Annotated[npt.NDArray[DType], ("b", "d")]
 
 @dataclasses.dataclass

@@ -48,12 +48,12 @@ class DummyEnv(BaseEnv):
     def fake_obs(self) -> Observation:
         obs = Observation(
             images={
-                "base": np.random.rand(1, self.img_height, self.img_width, 3).astype(np.float32),
-                "wrist": np.random.rand(1, self.img_height // 2, self.img_width // 2, 3).astype(np.float32),
+                "base": np.random.randint(0, 255, (1, self.img_height, self.img_width, 3)).astype(np.uint8),
+                "wrist": np.random.randint(0, 255, (1, self.img_height // 2, self.img_width // 2, 3)).astype(np.uint8),
             },
             states={
-                "robot_state": np.random.rand(1, self.state_dim).astype(np.float32),
-                "joint_angles": np.random.rand(1, self.state_dim // 2).astype(np.float32),
+                "robot_state": np.random.rand(1, self.state_dim),
+                "joint_angles": np.random.rand(1, self.state_dim // 2)
             },
             text=self.text,
         )
