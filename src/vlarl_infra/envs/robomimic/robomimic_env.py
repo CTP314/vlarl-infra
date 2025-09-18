@@ -6,6 +6,7 @@ import numpy as np
 
 try:
     import robomimic
+    import robomimic.envs.env_robosuite
     import robomimic.utils.env_utils as _env_utils
     import robomimic.utils.obs_utils as _obs_utils
 except:
@@ -33,7 +34,7 @@ class RobomimicConfig(BaseEnvConfig):
     
 @register_env(UID)
 class RobomimicEnv(BaseEnv):
-    env: robomimic.envs.env_base.EnvBase
+    env: robomimic.envs.env_robosuite.EnvRobosuite
     image_keys: list[str]
     task: str
     agentview_image_size: tuple[int, int]
@@ -51,12 +52,14 @@ class RobomimicEnv(BaseEnv):
             low_dim=config.low_dim_keys,
         ))
         
-        self.env = _env_utils.create_env_from_metadata(
+        env = _env_utils.create_env_from_metadata(
             env_meta=env_meta,
             render=False,
             render_offscreen=True,
             use_image_obs=True,
         )
+        assert isinstance(env, robomimic.envs.env_robosuite.EnvRobosuite)
+        self.env = env
         
         self.env.env.hard_reset = False
         
