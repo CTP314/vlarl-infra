@@ -14,7 +14,7 @@ dependencies = [
     "websockets (>=15.0.1,<16.0.0)",
     "msgpack (>=1.1.1,<2.0.0)",
     "tyro (>=0.9.31,<0.10.0)",
-    "vlarl-client @ file:///home/polaris/tea/vlarl/vlarl_client"
+    "vlarl-client @ file:///home/polaris/tea/vlarl/vlarl_client",
 ]
 
 [tool.poetry]

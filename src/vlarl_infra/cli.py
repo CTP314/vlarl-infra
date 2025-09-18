@@ -9,6 +9,7 @@ import vlarl_infra
 from vlarl_infra.utils.registration import REGISTERED_ENV_CONFIGS
 from vlarl_infra.envs.base_env import BaseEnvConfig
 from vlarl_client.websocket_worker_agent import WebSocketWorkerAgent
+from vlarl_infra.utils.wrappers import RemoteViewerWrapper
 
 
 @dataclasses.dataclass
@@ -18,9 +19,14 @@ class Args:
     num_episodes: int = 1
     log_level: Literal["DEBUG", "INFO"] = "INFO"
     
-    host: str =  "0.0.0.0"
-    port: int = 8000
+    server_host: str =  "0.0.0.0"
+    server_port: int = 8000
     
+    use_remote_viewer: bool = False
+    
+    viewer_host: str = "0.0.0.0"
+    viewer_port: int = 8001
+
 _CONFIGS_DICT = {k.lower(): Args(uid=k, env=v) for k, v in REGISTERED_ENV_CONFIGS.items()}
 
 def cli() -> Args:
@@ -34,13 +40,17 @@ def _main(args: Args):
     logger.info(f"Env config: {args.env}")
 
     try: 
-        worker_agent = WebSocketWorkerAgent(host=args.host, port=args.port)
+        worker_agent = WebSocketWorkerAgent(host=args.server_host, port=args.server_port)
         logger.info(f"Connected to server with metadata: {worker_agent.get_server_metadata()}")
     except Exception as e:
         logger.error(f"Failed to connect to server: {e}")
         return
 
     env = gym.make(args.uid, config=args.env)
+    
+    if args.use_remote_viewer:
+        env = RemoteViewerWrapper(env, websocket_uri=f"ws://{args.viewer_host}:{args.viewer_port}/ws/env")
+        logger.info(f"Remote viewer enabled at {args.viewer_host}:{args.viewer_port}")
 
     for ep in range(args.num_episodes):
         obs, info = env.reset()

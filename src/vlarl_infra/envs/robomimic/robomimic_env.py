@@ -32,7 +32,7 @@ class RobomimicConfig(BaseEnvConfig):
     ])
     agentview_image_size: tuple[int, int] = (720, 1280)
     
-@register_env(UID)
+@register_env(UID, max_episode_steps=1000)
 class RobomimicEnv(BaseEnv):
     env: robomimic.envs.env_robosuite.EnvRobosuite
     image_keys: list[str]

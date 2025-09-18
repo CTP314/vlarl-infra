@@ -46,13 +46,13 @@ class MockAgentServer:
                     continue # 跳过，继续等待下一个INFER请求
 
                 obs = infer_msg.get("data")
-                logger.info(f"Received inference request for observation: {obs}")
+                # logger.info(f"Received inference request for observation: {obs}")
 
                 # 3. 模拟推理并发送动作
                 action = np.random.rand(1, self._action_dim).astype(np.float32)
                 action_response = dict(message_type=str(MessageType.ACTION), data={"action": action})
                 await websocket.send(packer.pack(action_response))
-                logger.info(f"Sent back dummy action: {action}")
+                # logger.info(f"Sent back dummy action: {action}")
                 
                 # 4. 立即等待并处理 FEEDBACK 消息
                 # 这是一个阻塞的操作，确保服务器在处理完一个step后才继续
@@ -69,7 +69,7 @@ class MockAgentServer:
             logger.info(f"Connection from {websocket.remote_address} closed.")
         except Exception:
             traceback_str = traceback.format_exc()
-            logger.error(f"Internal server error:\n{traceback_str}")
+            logger.error(f"Internal server error:\n{traceback_str} {packed_infer_msg}")
             await websocket.close(
                 code=websockets.frames.CloseCode.INTERNAL_ERROR,
                 reason="Internal server error."
