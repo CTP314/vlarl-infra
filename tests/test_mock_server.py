@@ -49,7 +49,7 @@ class MockAgentServer:
                 logger.info(f"Received inference request for observation: {obs}")
 
                 # 3. 模拟推理并发送动作
-                action = np.random.rand(self._action_dim).astype(np.float32)
+                action = np.random.rand(1, self._action_dim).astype(np.float32)
                 action_response = dict(message_type=str(MessageType.ACTION), data={"action": action})
                 await websocket.send(packer.pack(action_response))
                 logger.info(f"Sent back dummy action: {action}")

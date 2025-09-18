@@ -25,6 +25,19 @@ vlarl-run-worker = "vlarl_infra.cli:main"
 
 [tool.poetry.dependencies]
 vlarl-client = {develop = true}
+
+[tool.poetry.group.robomimic.dependencies]
+cython = "<3"
+d4rl = "^1.1"
+patchelf = "^0.17.2.4"
+robomimic = "0.3.0"
+robosuite = {git = "https://github.com/ARISE-Initiative/robosuite.git", rev = "v1.4.1"}
+pyopengl = "3.1.4"
+
+
+[tool.poetry.group.dev.dependencies]
+ipdb = "^0.13.13"
+
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
