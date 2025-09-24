@@ -18,7 +18,7 @@ class Observation:
     states: Dict[str, StateArray]
     text: str
     
-Action = Annotated[npt.NDArray[np.float32], ("b", "da")]
+Action = Annotated[npt.NDArray[DType], ("b", "da")]
 
 @dataclasses.dataclass
 class BaseEnvConfig:

@@ -9,7 +9,7 @@ import vlarl_infra
 from vlarl_infra.utils.registration import REGISTERED_ENV_CONFIGS
 from vlarl_infra.envs.base_env import BaseEnvConfig
 from vlarl_client.websocket_worker_agent import WebSocketWorkerAgent
-from vlarl_infra.utils.wrappers import RemoteViewerWrapper
+import vlarl_infra.utils.wrappers as _wrappers
 
 
 @dataclasses.dataclass
@@ -26,6 +26,9 @@ class Args:
     
     viewer_host: str = "0.0.0.0"
     viewer_port: int = 8001
+    
+    use_real_time: bool = False
+    fps: float = 30.0
 
 _CONFIGS_DICT = {k.lower(): Args(uid=k, env=v) for k, v in REGISTERED_ENV_CONFIGS.items()}
 
@@ -49,8 +52,12 @@ def _main(args: Args):
     env = gym.make(args.uid, config=args.env)
     
     if args.use_remote_viewer:
-        env = RemoteViewerWrapper(env, websocket_uri=f"ws://{args.viewer_host}:{args.viewer_port}/ws/env")
+        env = _wrappers.RemoteViewerWrapper(env, websocket_uri=f"ws://{args.viewer_host}:{args.viewer_port}/ws/env")
         logger.info(f"Remote viewer enabled at {args.viewer_host}:{args.viewer_port}")
+
+    if args.use_real_time:
+        env = _wrappers.RealTimeWrapper(env, fps=args.fps)
+        logger.info(f"Real-time mode enabled at {args.fps} FPS")
 
     for ep in range(args.num_episodes):
         obs, info = env.reset()

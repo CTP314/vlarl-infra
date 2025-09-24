@@ -33,10 +33,14 @@ patchelf = "^0.17.2.4"
 robomimic = "0.3.0"
 robosuite = {git = "https://github.com/ARISE-Initiative/robosuite.git", rev = "v1.4.1"}
 pyopengl = "3.1.4"
+gymnasium = {extras = ["atari"], version = "^1.2.1"}
 
 
 [tool.poetry.group.dev.dependencies]
 ipdb = "^0.13.13"
+
+
+[tool.poetry.group.atari.dependencies]
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

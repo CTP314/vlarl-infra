@@ -25,8 +25,8 @@ class RemoteViewerCommunicator:
 
     def _numpy_to_base64_jpeg(self, np_array: np.ndarray) -> str:
         # If it's a grayscale image (2D array), convert to RGB first
-        if np_array.ndim == 2:
-            img = Image.fromarray(np_array, 'L')
+        if np_array.ndim == 3 and np_array.shape[-1] == 1:
+            img = Image.fromarray(np_array[..., 0], 'L')
             img = img.convert("RGB")
         # If it's an RGB/RGBA image
         elif np_array.ndim == 3 and np_array.shape[-1] in [3, 4]:
