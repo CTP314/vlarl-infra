@@ -17,8 +17,8 @@ class Args:
     uid: tyro.conf._markers.Suppress[str]
     env: BaseEnvConfig
     num_episodes: int = 1
-    log_level: Literal["DEBUG", "INFO"] = "INFO"
-    
+    log_level: Literal["debug", "info"] = "info"
+
     server_host: str =  "0.0.0.0"
     server_port: int = 8000
     
@@ -36,7 +36,7 @@ def cli() -> Args:
     return tyro.extras.overridable_config_cli({k: (k, v) for k, v in _CONFIGS_DICT.items()})
 
 def _main(args: Args):
-    logger.configure(handlers=[{"sink": sys.stdout, "level": args.log_level}])
+    logger.configure(handlers=[{"sink": sys.stdout, "level": args.log_level.upper()}])
 
     logger.info(f"vlarl_infra version: {vlarl_infra.__version__}")
     logger.info(f"Selected env: {args.uid}")
