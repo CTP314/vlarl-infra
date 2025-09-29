@@ -1,5 +1,6 @@
 import dataclasses
 import sys
+import collections
 from typing import Literal
 import gymnasium as gym
 import tyro
@@ -29,6 +30,8 @@ class Args:
     
     use_real_time: bool = False
     fps: float = 30.0
+    
+    replan_steps: int | None = None
 
 _CONFIGS_DICT = {k.lower(): Args(uid=k, env=v) for k, v in REGISTERED_ENV_CONFIGS.items()}
 
@@ -61,22 +64,31 @@ def _main(args: Args):
 
     for ep in range(args.num_episodes):
         obs, info = env.reset()
+        action_plan = collections.deque()
         logger.info(f"Episode {ep}:")
         logger.info("  Info:", info)
         
-        terminated = False
-        truncated = False
-        step_count = 0
-        total_reward = 0.0
+        reward, terminated, truncated = 0.0, False, False
+        step_count, total_reward, sum_reward = 0, 0., 0.
         
         while not (terminated or truncated):
-            action_data = worker_agent.infer(dataclasses.asdict(obs))
-            action = action_data["action"]
+            if not action_plan:
+                sum_reward += float(reward)
+                action_data = worker_agent.infer(dataclasses.asdict(obs))
+                action_chunk = action_data["action"].swapaxes(1, 0)
+                replan_steps = args.replan_steps or len(action_chunk)
+                assert (
+                    len(action_chunk) >= replan_steps
+                ), f"We want to replan every {args.replan_steps} steps, but policy only predicts {len(action_chunk)} steps."
+                action_plan.extend(action_chunk)
+            action = action_plan.popleft()
             obs, reward, terminated, truncated, info = env.step(action)
             step_count += 1
-            total_reward += float(reward)
+            total_reward += float(reward)        
+            sum_reward += float(reward)
 
-            worker_agent.feedback(dataclasses.asdict(obs), float(reward), terminated, truncated, info)
+            if not action_plan or terminated or truncated:
+                worker_agent.feedback(dataclasses.asdict(obs), float(reward), terminated, truncated, info)
 
             if step_count % 100 == 0 or terminated or truncated:
                 logger.debug(f"    Step {step_count}: reward={reward}, terminated={terminated}, truncated={truncated}")
