@@ -22,7 +22,7 @@ Action = Annotated[npt.NDArray[DType], ("b", "da")]
 
 @dataclasses.dataclass
 class BaseEnvConfig:
-    ...
+    max_episode_steps: int | None = None
 
 class BaseEnv(gym.Env, abc.ABC):    
     def __init__(self, config: BaseEnvConfig):

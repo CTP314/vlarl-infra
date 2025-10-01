@@ -32,6 +32,7 @@ class Args:
     fps: float = 30.0
     
     replan_steps: int | None = None
+    max_episode_steps: int | None = None
 
 _CONFIGS_DICT = {k.lower(): Args(uid=k, env=v) for k, v in REGISTERED_ENV_CONFIGS.items()}
 
@@ -52,8 +53,7 @@ def _main(args: Args):
         logger.error(f"Failed to connect to server: {e}")
         return
 
-    env = gym.make(args.uid, config=args.env)
-    
+    env = gym.make(args.uid, config=args.env, max_episode_steps=args.max_episode_steps)
     if args.use_remote_viewer:
         env = _wrappers.RemoteViewerWrapper(env, websocket_uri=f"ws://{args.viewer_host}:{args.viewer_port}/ws/env")
         logger.info(f"Remote viewer enabled at {args.viewer_host}:{args.viewer_port}")
@@ -93,7 +93,7 @@ def _main(args: Args):
             if step_count % 100 == 0 or terminated or truncated:
                 logger.debug(f"    Step {step_count}: reward={reward}, terminated={terminated}, truncated={truncated}")
 
-        logger.info(f"  Episode {ep} finished after {step_count} steps with total reward {total_reward}")
+        logger.info(f"  Episode {ep} finished after {step_count} steps with total reward {total_reward} and info {info}")
     
 def main():
     _main(cli())

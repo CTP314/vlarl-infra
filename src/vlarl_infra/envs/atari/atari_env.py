@@ -18,16 +18,15 @@ UID = "Atari-v1"
 @register_env_config(UID)
 @dataclasses.dataclass
 class AtariConfig(BaseEnvConfig):
-    atari_env_name: str = "BreakoutNoFrameskip-v4"
+    name: str = "BreakoutNoFrameskip-v4"
     
-@register_env(UID, max_episode_steps=10000)
+@register_env(UID)
 class AtariEnv(BaseEnv):
     env: gym.Env
     
     def __init__(self, config: AtariConfig):
         super().__init__(config=config)
-        env = gym.make(config.atari_env_name, render_mode="rgb_array")
-        env = gym.wrappers.RecordEpisodeStatistics(env)
+        env = gym.make(config.name, render_mode="rgb_array")
         env = NoopResetEnv(env, noop_max=30)
         env = MaxAndSkipEnv(env, skip=4)
         env = EpisodicLifeEnv(env)
@@ -37,7 +36,7 @@ class AtariEnv(BaseEnv):
         env = gym.wrappers.GrayscaleObservation(env)
         env = gym.wrappers.FrameStackObservation(env, 4)
         self.env = env
-        self.game_name = config.atari_env_name
+        self.game_name = config.name
         
     def prepare_obs(self, obs: np.ndarray) -> Observation:
         frames = {

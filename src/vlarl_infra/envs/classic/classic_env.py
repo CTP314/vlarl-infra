@@ -17,14 +17,13 @@ UID = "Classic-v1"
 class ClassicConfig(BaseEnvConfig):
     classic_env_name: str = "CartPole-v1"
     
-@register_env(UID, max_episode_steps=10000)
+@register_env(UID)
 class ClassicEnv(BaseEnv):
     env: gym.Env
     
     def __init__(self, config: ClassicConfig):
         super().__init__(config=config)
         env = gym.make(config.classic_env_name, render_mode="rgb_array")
-        env = gym.wrappers.RecordEpisodeStatistics(env)
         self.env = env
         self.game_name = config.classic_env_name
         

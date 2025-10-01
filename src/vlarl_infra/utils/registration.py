@@ -10,6 +10,7 @@ from loguru import logger
 from gymnasium.envs.registration import EnvSpec as GymEnvSpec
 
 from vlarl_infra.envs.base_env import BaseEnv, BaseEnvConfig
+from vlarl_infra.utils.wrappers.success_record_wrapper import RecordSuccessByStep
 
 class EnvSpec:
     def __init__(self, uid: str, cls: Type[BaseEnv], max_episode_steps: int | None = None, default_kwargs: dict | None = None):
@@ -22,16 +23,6 @@ class EnvSpec:
         _kwargs = self.default_kwargs.copy()
         _kwargs.update(kwargs)
         return self.cls(**_kwargs)
-    
-    @property
-    def gym_spec(self) -> GymEnvSpec:
-        entry_point = self.cls.__module__ + ":" + self.cls.__name__
-        return GymEnvSpec(
-            self.uid,
-            entry_point,
-            max_episode_steps=self.max_episode_steps,
-            kwargs=self.default_kwargs,
-        )
         
 REGISTERED_ENVS: Dict[str, EnvSpec] = {}
 
@@ -64,6 +55,7 @@ def make(env_id, **kwargs):
 def register_env(
     uid: str,
     max_episode_steps: int | None = None,
+    best_reward_threshold_for_success: float | None = None,
     override: bool = False,
     **kwargs,
 ):
@@ -114,6 +106,10 @@ def register_env(
             max_episode_steps=max_episode_steps,
             disable_env_checker=True,  # Temporary solution as we allow empty observation spaces
             kwargs=deepcopy(kwargs),
+            additional_wrappers=(
+                gym.wrappers.RecordEpisodeStatistics.wrapper_spec(), 
+                RecordSuccessByStep.wrapper_spec(best_reward_threshold_for_success=best_reward_threshold_for_success)
+            ),
         )
 
         return cls

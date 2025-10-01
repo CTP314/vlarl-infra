@@ -23,7 +23,7 @@ ENV_META_DIR = pathlib.Path(__file__).parent / "env_meta"
 @register_env_config(UID)
 @dataclasses.dataclass
 class RobomimicConfig(BaseEnvConfig):
-    robomimic_env_name: str = "can-img"
+    name: str = "can-img"
     low_dim_keys: list[str] = dataclasses.field(default_factory=lambda: [
         'robot0_eef_pos',
         'robot0_eef_quat',
@@ -32,7 +32,7 @@ class RobomimicConfig(BaseEnvConfig):
     ])
     agentview_image_size: tuple[int, int] = (720, 1280)
     
-@register_env(UID, max_episode_steps=1000)
+@register_env(UID, best_reward_threshold_for_success=1.)
 class RobomimicEnv(BaseEnv):
     env: robomimic.envs.env_robosuite.EnvRobosuite
     image_keys: list[str]
@@ -43,10 +43,10 @@ class RobomimicEnv(BaseEnv):
         super().__init__(config=config)
         
         try:
-            env_meta_json_path = ENV_META_DIR / f"{config.robomimic_env_name}.json"
+            env_meta_json_path = ENV_META_DIR / f"{config.name}.json"
             env_meta = json.load(open(env_meta_json_path, 'r'))
         except FileNotFoundError:
-            raise ValueError(f"Environment metadata file not found for env name: {config.robomimic_env_name}")
+            raise ValueError(f"Environment metadata file not found for env name: {config.name}")
         
         _obs_utils.initialize_obs_modality_mapping_from_dict(dict(
             low_dim=config.low_dim_keys,
