@@ -14,7 +14,7 @@ dependencies = [
     "websockets (>=15.0.1,<16.0.0)",
     "msgpack (>=1.1.1,<2.0.0)",
     "tyro (>=0.9.31,<0.10.0)",
-    "vlarl-client @ file:///home/polaris/tea/vlarl/vlarl_client",
+    "vlarl-client @ git+ssh://git@github.com/CTP314/vlarl-client.git",
 ]
 
 [tool.poetry]
@@ -24,7 +24,6 @@ packages = [{include = "vlarl_infra", from = "src"}]
 vlarl-run-worker = "vlarl_infra.cli:main"
 
 [tool.poetry.dependencies]
-vlarl-client = {develop = true}
 
 [tool.poetry.group.robomimic.dependencies]
 cython = "<3"

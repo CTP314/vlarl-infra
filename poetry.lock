@@ -4092,7 +4092,7 @@ optional = false
 python-versions = ">=3.10,<4.0"
 groups = ["main"]
 files = []
-develop = true
+develop = false
 
 [package.dependencies]
 loguru = ">=0.7.3,<0.8.0"
@@ -4100,8 +4100,10 @@ msgpack = ">=1.1.1,<2.0.0"
 numpy = "<2.3.3"
 
 [package.source]
-type = "directory"
-url = "../vlarl_client"
+type = "git"
+url = "ssh://git@github.com/CTP314/vlarl-client.git"
+reference = "HEAD"
+resolved_reference = "ccae3ffab06dfd5fccadc982913d0a5184db5f48"
 
 [[package]]
 name = "wcwidth"
@@ -4342,4 +4344,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<4.0"
-content-hash = "7d1493b5145a7c79873e16d14e22351c88a970bf7fbcf538eee896d32c7cee1f"
+content-hash = "c329026a509a758cc427fdf8cf9afff1b0f4c2860e81715a4ed76ba3ef2a600d"
