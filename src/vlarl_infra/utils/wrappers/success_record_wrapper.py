@@ -45,9 +45,9 @@ class RecordSuccessByStep(gym.Wrapper[ObsType, ActType, ObsType, ActType]):
             self.episode_success_queue.append(is_episode_success)
             mean_success_rate = float(np.mean(self.episode_success_queue))
             
-            info["episode"] = {
+            info["episode"].update({
                 "s": is_episode_success,
                 "mean_success_rate": mean_success_rate,
-            }
-            
+            })
+
         return observation, reward, terminated, truncated, info

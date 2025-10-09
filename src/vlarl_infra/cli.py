@@ -91,7 +91,7 @@ def _main(args: Args):
                 worker_agent.feedback(dataclasses.asdict(obs), float(reward), terminated, truncated, info)
 
             if step_count % 100 == 0 or terminated or truncated:
-                logger.debug(f"    Step {step_count}: reward={reward}, terminated={terminated}, truncated={truncated}")
+                logger.debug(f"    Step {step_count}: reward={reward}, terminated={terminated}, truncated={truncated}, info={info}")
 
         logger.info(f"  Episode {ep} finished after {step_count} steps with total reward {total_reward} and info {info}")
     
